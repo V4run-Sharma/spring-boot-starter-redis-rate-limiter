@@ -1,0 +1,87 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="GrazieInspection" enabled="false" level="GRAMMAR_ERROR" enabled_by_default="false" />
+    <inspection_tool class="LanguageDetectionInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
+    <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
+      <option name="processCode" value="true" />
+      <option name="processLiterals" value="true" />
+      <option name="processComments" value="true" />
+    </inspection_tool>
+    <inspection_tool class="VulnerableLibrariesLocal" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="isIgnoringEnabled" value="true" />
+      <option name="ignoredModules">
+        <list>
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+          <option value="account-service" />
+        </list>
+      </option>
+      <option name="ignoredPackages">
+        <list>
+          <option value="org.springframework.boot:spring-boot:2.0.3.RELEASE" />
+          <option value="org.springframework.boot:spring-boot-autoconfigure:2.0.3.RELEASE" />
+          <option value="org.springframework.security.oauth:spring-security-oauth2:2.2.1.RELEASE" />
+          <option value="commons-codec:commons-codec:1.11" />
+          <option value="org.codehaus.jackson:jackson-mapper-asl:1.9.13" />
+          <option value="org.bouncycastle:bcprov-jdk15on:1.56" />
+          <option value="org.springframework:spring-beans:5.0.7.RELEASE" />
+          <option value="org.springframework.security:spring-security-config:5.0.6.RELEASE" />
+          <option value="org.springframework.security:spring-security-core:5.0.6.RELEASE" />
+          <option value="org.springframework:spring-context:5.0.7.RELEASE" />
+          <option value="org.springframework.security:spring-security-web:5.0.6.RELEASE" />
+          <option value="com.fasterxml.jackson.core:jackson-databind:2.9.6" />
+          <option value="org.springframework:spring-web:5.0.7.RELEASE" />
+          <option value="org.springframework:spring-webmvc:5.0.7.RELEASE" />
+          <option value="org.springframework:spring-core:5.0.7.RELEASE" />
+          <option value="org.yaml:snakeyaml:1.19" />
+          <option value="org.springframework:spring-expression:5.0.7.RELEASE" />
+          <option value="org.springframework.cloud:spring-cloud-config-client:2.0.0.RELEASE" />
+          <option value="com.fasterxml.jackson.core:jackson-core:2.9.6" />
+          <option value="org.springframework.security:spring-security-crypto:5.0.6.RELEASE" />
+        </list>
+      </option>
+      <option name="ignoredReasons">
+        <list>
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+          <option value="Not exploitable" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
