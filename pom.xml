@@ -6,7 +6,7 @@
 
     <groupId>io.github.v4run-sharma</groupId>
     <artifactId>spring-boot-starter-redis-ratelimiter</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>spring-boot-starter-redis-ratelimiter</name>
     <description>Spring Boot starter for Redis-backed method-level rate limiting.</description>
     <url>https://github.com/V4run-Sharma/spring-boot-starter-redis-ratelimiter</url>
@@ -161,24 +161,38 @@
                     <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.0</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
     </build>
 
     <profiles>
+        <profile>
+            <id>release</id>
+            <activation>
+                <property>
+                    <name>performRelease</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-gpg-plugin</artifactId>
+                        <version>3.2.0</version>
+                        <executions>
+                            <execution>
+                                <id>sign-artifacts</id>
+                                <phase>verify</phase>
+                                <goals>
+                                    <goal>sign</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
         <profile>
             <id>integration-tests</id>
             <activation>
