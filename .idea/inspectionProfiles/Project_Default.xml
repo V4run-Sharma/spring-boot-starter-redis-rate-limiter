@@ -2,6 +2,15 @@
   <profile version="1.0">
     <option name="myName" value="Project Default" />
     <inspection_tool class="GrazieInspection" enabled="false" level="GRAMMAR_ERROR" enabled_by_default="false" />
+    <inspection_tool class="IncorrectHttpHeaderInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="customHeaders">
+        <set>
+          <option value="RateLimit-Limit" />
+          <option value="RateLimit-Remaining" />
+          <option value="RateLimit-Reset" />
+        </set>
+      </option>
+    </inspection_tool>
     <inspection_tool class="LanguageDetectionInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
       <option name="processCode" value="true" />

@@ -4,6 +4,7 @@ import io.github.v4runsharma.ratelimiter.model.RateLimitDecision;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -19,7 +20,7 @@ public final class RateLimitExceptionHandler {
 
   private final boolean includeHttpHeaders;
 
-  public RateLimitExceptionHandler(boolean includeHttpHeaders) {
+  public RateLimitExceptionHandler(@Value("${ratelimiter.include-http-headers:true}") boolean includeHttpHeaders) {
     this.includeHttpHeaders = includeHttpHeaders;
   }
 
