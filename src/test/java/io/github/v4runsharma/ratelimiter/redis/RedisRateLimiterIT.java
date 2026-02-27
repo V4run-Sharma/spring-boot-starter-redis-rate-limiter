@@ -27,7 +27,7 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
 @Testcontainers(disabledWithoutDocker = true)
-class RedisRateLimiterIntegrationTest {
+class RedisRateLimiterIT {
 
   private static final Instant FIXED_TIME = Instant.ofEpochMilli(1_700_000_005_123L);
 

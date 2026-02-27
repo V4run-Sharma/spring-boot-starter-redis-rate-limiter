@@ -66,8 +66,9 @@ When Micrometer is present:
 
 ## Testing Notes
 
-- Unit tests run without Redis.
-- Integration tests use Testcontainers and are skipped if Docker is unavailable.
+- Unit tests run with `mvn test`.
+- Redis integration tests are property-gated and run with `mvn verify -DrunITs=true`.
+- Local integration tests require a running Docker engine (Docker Desktop on macOS).
 
 ## Release
 
