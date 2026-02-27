@@ -1,5 +1,6 @@
 package io.github.v4runsharma.ratelimiter.core;
 
+import io.github.v4runsharma.ratelimiter.annotation.RateLimit;
 
 import java.lang.reflect.Method;
 

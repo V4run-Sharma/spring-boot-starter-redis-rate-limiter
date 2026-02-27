@@ -7,6 +7,9 @@ import java.util.Optional;
 // Result of a single rate limit evaluation.
 public class RateLimitDecision {
 
+  /**
+   * Unknown retry/remaining-time marker.
+   */
   public static final long REMAINING_TIME_UNKNOWN = -1L;
 
   private final boolean isAllowed; // Whether the request is allowed
@@ -35,7 +38,18 @@ public class RateLimitDecision {
     return isAllowed;
   }
 
+  /**
+   * Milliseconds the caller should wait before retrying.
+   * <p>Value is {@code 0} when allowed and {@link #REMAINING_TIME_UNKNOWN} when unavailable.
+   */
   public long getRemainingTime() {
+    return remainingTime;
+  }
+
+  /**
+   * Alias of {@link #getRemainingTime()} for clearer HTTP/retry semantics.
+   */
+  public long getRetryAfterMillis() {
     return remainingTime;
   }
 
