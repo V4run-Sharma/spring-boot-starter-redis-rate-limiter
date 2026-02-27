@@ -1,0 +1,34 @@
+{
+  "properties": [
+    {
+      "name": "ratelimiter.enabled",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Enables rate limiter auto-configuration."
+    },
+    {
+      "name": "ratelimiter.redis-key-prefix",
+      "type": "java.lang.String",
+      "defaultValue": "ratelimiter",
+      "description": "Prefix used for Redis rate-limit keys."
+    },
+    {
+      "name": "ratelimiter.fail-open",
+      "type": "java.lang.Boolean",
+      "defaultValue": false,
+      "description": "Allows requests when Redis backend fails."
+    },
+    {
+      "name": "ratelimiter.include-http-headers",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Adds Retry-After and RateLimit headers to HTTP 429 responses."
+    },
+    {
+      "name": "ratelimiter.metrics-enabled",
+      "type": "java.lang.Boolean",
+      "defaultValue": true,
+      "description": "Enables Micrometer metrics when a MeterRegistry is present."
+    }
+  ]
+}
