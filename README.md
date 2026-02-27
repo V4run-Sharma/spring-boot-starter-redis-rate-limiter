@@ -193,7 +193,7 @@ Example `~/.m2/settings.xml` snippet:
 
 ### Snapshot release
 
-Use a `-SNAPSHOT` version (for example `1.0.1-SNAPSHOT`) and run:
+Use a `-SNAPSHOT` version (for example `1.0.0`) and run:
 
 ```bash
 mvn -DskipTests clean deploy

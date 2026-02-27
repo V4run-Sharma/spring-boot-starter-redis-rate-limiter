@@ -4,12 +4,12 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>io.github.v4runsharma</groupId>
+    <groupId>io.github.v4run-sharma</groupId>
     <artifactId>spring-boot-starter-redis-ratelimiter</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>spring-boot-starter-redis-ratelimiter</name>
     <description>Spring Boot starter for Redis-backed method-level rate limiting.</description>
-    <url>https://github.com/v4runsharma/spring-boot-starter-redis-ratelimiter</url>
+    <url>https://github.com/V4run-Sharma/spring-boot-starter-redis-ratelimiter</url>
 
     <licenses>
         <license>
@@ -21,29 +21,18 @@
 
     <developers>
         <developer>
-            <id>v4runsharma</id>
+            <id>v4run-sharma</id>
             <name>Varun Sharma</name>
-            <url>https://github.com/v4runsharma</url>
+            <url>https://github.com/V4run-Sharma</url>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/v4runsharma/spring-boot-starter-redis-ratelimiter.git</connection>
-        <developerConnection>scm:git:ssh://github.com:v4runsharma/spring-boot-starter-redis-ratelimiter.git</developerConnection>
-        <url>https://github.com/v4runsharma/spring-boot-starter-redis-ratelimiter</url>
-        <tag>HEAD</tag>
+        <connection>scm:git:git://github.com/V4run-Sharma/spring-boot-starter-redis-ratelimiter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:V4run-Sharma/spring-boot-starter-redis-ratelimiter.git
+        </developerConnection>
+        <url>https://github.com/V4run-Sharma/spring-boot-starter-redis-ratelimiter</url>
     </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
 
     <properties>
         <spring.boot.version>3.4.5</spring.boot.version>
@@ -160,6 +149,16 @@
                 </executions>
                 <configuration>
                     <source>17</source>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.5.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
                 </configuration>
             </plugin>
         </plugins>
