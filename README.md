@@ -8,11 +8,35 @@ A lightweight Spring Boot starter for annotation-driven rate limiting backed by 
 
 This starter provides a production-focused, log-and-metrics-friendly approach to request throttling and complements API Gateway-level rate limiting by enabling method-level protection inside services.
 
+## Table of Contents
+
+- [Features](#features)
+- [Why This Starter](#why-this-starter)
+- [Requirements](#requirements)
+- [Quick Start](#quick-start)
+  - [1. Add Dependency](#1-add-dependency)
+  - [2. Configure Redis](#2-configure-redis)
+  - [3. Add `@RateLimit` to Service Methods](#3-add-ratelimit-to-service-methods)
+- [Understanding Keying](#understanding-keying)
+- [Per-User Example with Custom Key Resolver](#per-user-example-with-custom-key-resolver)
+- [Class-Level Annotation](#class-level-annotation)
+- [What Happens When the Limit Is Exceeded](#what-happens-when-the-limit-is-exceeded)
+- [Configuration](#configuration)
+- [Metrics](#metrics)
+- [How It Works](#how-it-works)
+- [Quick Validation Checklist](#quick-validation-checklist)
+- [Testing](#testing)
+- [Compatibility](#compatibility)
+- [Relationship to API Gateway Rate Limiting](#relationship-to-api-gateway-rate-limiting)
+- [Release to Maven Central](#release-to-maven-central)
+- [License](#license)
+- [Contributing](#contributing)
+
 ## Features
 
 - `@RateLimit` annotation for method-level and class-level throttling
 - Redis fixed-window implementation using `INCR` + TTL (no Lua scripts)
-- Automatic Spring Boot 3.x auto-configuration
+- Automatic Spring Boot 3.x auto-configuration (no manual AOP wiring)
 - HTTP `429` mapping with optional `Retry-After` and `RateLimit-*` headers
 - Pluggable key resolution strategy (`RateLimitKeyResolver`)
 - Pluggable policy resolution strategy (`RateLimitPolicyProvider`)
@@ -26,32 +50,51 @@ In distributed systems, not all limits belong at the edge. Internal service meth
 
 This starter standardizes method-level rate limiting so teams avoid duplicating AOP, Redis keying logic, HTTP handling, and metrics wiring in every service.
 
-## Installation
-
-Add the dependency:
-
-```xml
-<dependency>
-  <groupId>io.github.v4runsharma</groupId>
-  <artifactId>spring-boot-starter-redis-ratelimiter</artifactId>
-  <version>1.0-SNAPSHOT</version>
-</dependency>
-```
-
-Requirements:
+## Requirements
 
 - Java 17+
 - Spring Boot 3.x
-- Redis available to your app
+- Redis reachable from your app
 
 ## Quick Start
 
-1. Add the dependency.
-2. Configure your Redis connection (standard Spring Boot Redis properties).
-3. Add `@RateLimit` to service methods.
-4. Run the application.
+### 1. Add Dependency
 
-### Example
+Maven (`pom.xml`):
+
+```xml
+<dependency>
+  <groupId>io.github.v4run-sharma</groupId>
+  <artifactId>spring-boot-starter-redis-ratelimiter</artifactId>
+  <version>1.0.1</version>
+</dependency>
+```
+
+Gradle:
+
+```gradle
+implementation("io.github.v4run-sharma:spring-boot-starter-redis-ratelimiter:1.0.1")
+```
+
+### 2. Configure Redis
+
+`application.yml`:
+
+```yaml
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+```
+
+Local Redis with Docker:
+
+```bash
+docker run --name redis-ratelimiter -p 6379:6379 -d redis:7-alpine
+```
+
+### 3. Add `@RateLimit` to Service Methods
 
 ```java
 import io.github.v4runsharma.ratelimiter.annotation.RateLimit;
@@ -63,7 +106,7 @@ public class BillingService {
 
   @RateLimit(
       name = "invoice-create",
-      scope = "USER",
+      scope = "GLOBAL",
       limit = 10,
       duration = 1,
       timeUnit = TimeUnit.MINUTES
@@ -74,18 +117,79 @@ public class BillingService {
 }
 ```
 
-## Default Behavior
+## Understanding Keying
 
-Out of the box, the starter:
+By default, the starter resolves keys like this:
 
-- Resolves policy from `@RateLimit` annotation values
-- Resolves key using default strategy:
-  - `scope + ":" + annotation.key` if `key` is present
-  - otherwise `scope + ":" + targetClass#method`
-- Applies fixed-window Redis rate limiting
-- Throws `RateLimitExceededException` when blocked
-- Returns HTTP `429` with `ProblemDetail` in servlet apps
-- Publishes Micrometer metrics when `MeterRegistry` is present
+- If `key` is set on the annotation: `scope:key`
+- If `key` is not set: `scope:fully.qualified.ClassName#methodName`
+
+`scope` is a label, not identity by itself. If you need per-user or per-tenant limits, use a custom `RateLimitKeyResolver`.
+
+## Per-User Example with Custom Key Resolver
+
+```java
+import io.github.v4runsharma.ratelimiter.core.RateLimitContext;
+import io.github.v4runsharma.ratelimiter.key.RateLimitKeyResolver;
+import org.springframework.stereotype.Component;
+
+@Component
+public class UserIdKeyResolver implements RateLimitKeyResolver {
+  @Override
+  public String resolveKey(RateLimitContext context) {
+    Object[] args = context.getArguments();
+    String userId = String.valueOf(args[0]); // Example: first argument is userId
+    return "user:" + userId + ":" + context.getMethod().getName();
+  }
+}
+```
+
+Use it in the annotation:
+
+```java
+@RateLimit(
+    name = "invoice-create-per-user",
+    scope = "USER",
+    keyResolver = UserIdKeyResolver.class,
+    limit = 5,
+    duration = 1,
+    timeUnit = TimeUnit.MINUTES
+)
+public String createInvoice(String userId, String accountId) {
+  return "ok";
+}
+```
+
+## Class-Level Annotation
+
+`@RateLimit` can be placed on a class or a method. Method-level annotations take precedence over class-level annotations.
+
+## What Happens When the Limit Is Exceeded
+
+In Spring MVC (Servlet apps), the starter returns:
+
+- HTTP `429 Too Many Requests`
+- RFC7807 `ProblemDetail` body
+- Optional headers: `Retry-After`, `RateLimit-Limit`, `RateLimit-Remaining`, `RateLimit-Reset`
+
+Example response body:
+
+```json
+{
+  "type": "about:blank",
+  "title": "Rate limit exceeded",
+  "status": 429,
+  "detail": "Rate limit exceeded: invoice-create (limit=10, window=PT1M, remaining=34000)",
+  "timestamp": "2026-02-27T12:00:00Z",
+  "key": "global:com.example.BillingService#createInvoice",
+  "limit": 10,
+  "windowSeconds": 60,
+  "name": "invoice-create",
+  "retryAfterSeconds": 34
+}
+```
+
+When a `RateLimitExceededException` is thrown, it is mapped automatically by the starter's exception handler in servlet apps.
 
 ## Configuration
 
@@ -93,11 +197,11 @@ All properties are optional.
 
 | Property | Default | Description |
 |---|---|---|
-| `ratelimiter.enabled` | `true` | Enables/disables starter auto-configuration. |
+| `ratelimiter.enabled` | `true` | Master feature toggle for starter auto-configuration. |
 | `ratelimiter.redis-key-prefix` | `ratelimiter` | Prefix used for Redis bucket keys. |
 | `ratelimiter.fail-open` | `false` | If `true`, allows requests when Redis is unavailable. |
 | `ratelimiter.include-http-headers` | `true` | Adds `Retry-After` and `RateLimit-*` headers to `429` responses. |
-| `ratelimiter.metrics-enabled` | `true` | Enables Micrometer metrics recorder when registry is present. |
+| `ratelimiter.metrics-enabled` | `true` | Enables Micrometer metrics recorder when a registry is present. |
 
 Example:
 
@@ -109,27 +213,22 @@ ratelimiter.include-http-headers=true
 ratelimiter.metrics-enabled=true
 ```
 
-## HTTP Response Behavior
-
-When a call is rate limited:
-
-- Status: `429 Too Many Requests`
-- Body: RFC7807 `ProblemDetail`
-- Optional headers:
-  - `Retry-After`
-  - `RateLimit-Limit`
-  - `RateLimit-Remaining`
-  - `RateLimit-Reset`
-
 ## Metrics
 
 When Micrometer is available and enabled:
 
-- `ratelimiter.requests` counter (`outcome=allowed|blocked`)
+- `ratelimiter.requests` counter
 - `ratelimiter.errors` counter
 - `ratelimiter.evaluate.latency` timer
 
-## How It Works (High Level)
+Useful metric tags:
+
+- `name`
+- `scope`
+- `outcome` (`allowed` or `blocked`)
+- `exception` (for the error metric)
+
+## How It Works
 
 ```mermaid
 flowchart TD
@@ -144,6 +243,15 @@ flowchart TD
   H --> I["HTTP 429 handler (servlet)"]
 ```
 
+## Quick Validation Checklist
+
+1. Start Redis.
+2. Start your Spring Boot app.
+3. Hit a `@RateLimit`-protected endpoint repeatedly.
+4. Confirm HTTP `429` once the threshold is crossed.
+5. Confirm Redis keys are created with your configured prefix.
+6. Confirm metrics appear in your meter registry.
+
 ## Testing
 
 - Unit tests: `mvn test`
@@ -151,7 +259,7 @@ flowchart TD
 
 Notes:
 
-- Integration tests are in `*IT` classes and run through Maven Failsafe.
+- Integration tests live in `*IT` classes and run through Maven Failsafe.
 - Local integration testing requires a running Docker engine (for example Docker Desktop on macOS).
 
 ## Compatibility
@@ -193,7 +301,7 @@ Example `~/.m2/settings.xml` snippet:
 
 ### Snapshot release
 
-Use a `-SNAPSHOT` version (for example `1.0.0`) and run:
+Use a `-SNAPSHOT` version and run:
 
 ```bash
 mvn -DskipTests clean deploy
